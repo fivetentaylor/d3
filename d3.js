@@ -4870,9 +4870,7 @@ d3 = function() {
     },
     elastic: d3_ease_elastic,
     back: d3_ease_back,
-    bounce: function() {
-      return d3_ease_bounce;
-    }
+    bounce: d3_ease_bounce
   });
   var d3_ease_mode = d3.map({
     "in": d3_identity,
@@ -4943,8 +4941,16 @@ d3 = function() {
       return t * t * ((s + 1) * t - s);
     };
   }
-  function d3_ease_bounce(t) {
-    return t < 1 / 2.75 ? 7.5625 * t * t : t < 2 / 2.75 ? 7.5625 * (t -= 1.5 / 2.75) * t + .75 : t < 2.5 / 2.75 ? 7.5625 * (t -= 2.25 / 2.75) * t + .9375 : 7.5625 * (t -= 2.625 / 2.75) * t + .984375;
+  function d3_ease_bounce(h) {
+    if (!h || h >= .5 || h < 0) h = .25;
+    var b0 = 1 - h, b1 = b0 * (1 - b0) + b0, b2 = b0 * (1 - b1) + b1;
+    var x0 = 2 * Math.sqrt(h), x1 = x0 * Math.sqrt(h), x2 = x1 * Math.sqrt(h);
+    var t0 = 1 / (1 + x0 + x1 + x2), t1 = t0 + t0 * x0, t2 = t1 + t0 * x1;
+    var m0 = t0 + t0 * x0 / 2, m1 = t1 + t0 * x1 / 2, m2 = t2 + t0 * x2 / 2;
+    var a = 1 / (t0 * t0);
+    return function(t) {
+      return t < t0 ? a * t * t : t < t1 ? a * (t -= m0) * t + b0 : t < t2 ? a * (t -= m1) * t + b1 : a * (t -= m2) * t + b2;
+    };
   }
   d3.interpolateHcl = d3_interpolateHcl;
   function d3_interpolateHcl(a, b) {
